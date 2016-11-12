@@ -12,19 +12,23 @@ server.get('/', function (request, response) {
   var name = null;
 
   if (request.query.hasOwnProperty('fullname') && typeof request.query.fullname === 'string') {
-    name = request.query.fullname;
+    name = request.query.fullname.trim();
   }
 
-  if (name !== null && name.match(/^([A-ZА-Я](\.|[a-zа-яó]+)\s?){1,3}$/) !== null) {
-    switch (name.split(' ').length) {
+  if (name !== null && name.match(/^(?:(?:[а-яa-zó](\.|')?)+(\s?)+){1,3}$/i) !== null) {
+    switch (name.split(/\s+/).length) {
       case 3:
-        name = name.split(' ')[2] + ' ' + name[0] + '. ' + name.split(' ')[1][0] + '.';
+        if (/^[A-ZА-Я][a-zа-я]+\s[A-ZА-Я]\.\s[A-ZА-Я]\.$/.test(name)) {
+          break;
+        }
+        name = '' + name.split(/\s+/)[2][0].toUpperCase() + name.split(/\s+/)[2].substring(1).toLowerCase() + ' ' + name[0].toUpperCase() + '. ' + name.split(/\s+/)[1][0].toUpperCase() + '.';
         break;
       case 2:
-        name = name.split(' ')[1] + ' ' + name[0] + '.';
+        name = '' + name.split(/\s+/)[1][0].toUpperCase() + name.split(/\s+/)[1].substring(1).toLowerCase() + ' ' + name[0].toUpperCase() + '.';
         break;
       default:
     }
+    console.log(name.split(/\s+/), name.split(/\s+/).length);
   } else {
     name = null;
   }
